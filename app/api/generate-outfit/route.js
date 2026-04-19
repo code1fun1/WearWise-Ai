@@ -33,7 +33,6 @@ export async function POST(request) {
 
     const body = await request.json();
     const occasion = body.occasion?.trim();
-    const city = body.city?.trim() || "Mumbai";
 
     if (!occasion) {
       return NextResponse.json(
@@ -46,9 +45,12 @@ export async function POST(request) {
 
     // ── 1. Fetch wardrobe + user preferences ───────────────────
     const [wardrobeItems, user] = await Promise.all([
-      ClothingItem.find({ userId: session.user.id }).lean(),
+      ClothingItem.find({ userId: session.user.id, inLaundry: false }).lean(),
       User.findById(session.user.id).select("preferences").lean(),
     ]);
+
+    // Use body city → stored profile city → default
+    const city = body.city?.trim() || user?.preferences?.city || "Mumbai";
 
     if (wardrobeItems.length < 2) {
       return NextResponse.json(

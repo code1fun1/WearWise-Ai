@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wand2,
@@ -31,6 +31,13 @@ export default function OutfitsPage() {
   const [occasion, setOccasion] = useState("");
   const [city, setCity] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Auto-load city from profile
+  useEffect(() => {
+    axios.get("/api/profile").then(({ data }) => {
+      if (data.preferences?.city) setCity(data.preferences.city);
+    }).catch(() => {});
+  }, []);
 
   // Results
   const [outfits, setOutfits] = useState([]);
@@ -159,7 +166,7 @@ export default function OutfitsPage() {
           {/* City */}
           <div className="flex-1 min-w-[160px]">
             <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
-              Your City
+              Your City <span className="normal-case text-gray-400 font-normal">(saved in profile)</span>
             </label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />

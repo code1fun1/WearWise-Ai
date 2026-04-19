@@ -8,30 +8,30 @@ const ClothingItemSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    // Original uploaded image URL (Cloudinary)
-    imageUrl: { type: String, required: true },
-    // Cloudinary public_id — needed for deletion
-    cloudinaryId: { type: String, required: true },
+    imageUrl:    { type: String, required: true },
+    cloudinaryId:{ type: String, required: true },
 
-    // --- AI-generated tags ---
-    type: {
-      type: String,
-      // e.g. "t-shirt", "jeans", "dress", "sneakers", "jacket"
-      required: true,
-    },
-    color: { type: String, required: true },   // e.g. "navy blue"
-    pattern: { type: String, default: "solid" }, // e.g. "solid", "stripes", "floral"
-    style: { type: String, default: "casual" },  // e.g. "casual", "formal", "ethnic"
-    occasion: { type: [String], default: [] },   // e.g. ["office", "casual"]
-    season: { type: String, default: "all" },    // e.g. "summer", "winter", "all"
+    // AI-generated tags
+    type:    { type: String, required: true },
+    color:   { type: String, required: true },
+    pattern: { type: String, default: "solid" },
+    style:   { type: String, default: "casual" },
+    occasion:{ type: [String], default: [] },
+    season:  { type: String, default: "all" },
 
-    // Optional user override
+    // User overrides
     customName: { type: String, default: "" },
-    notes: { type: String, default: "" },
+    notes:      { type: String, default: "" },
 
-    // How many times this item was included in a selected outfit
+    // Wear tracking
     wearCount: { type: Number, default: 0 },
-    lastWorn: { type: Date, default: null },
+    lastWorn:  { type: Date, default: null },
+
+    // Cost per wear
+    purchasePrice: { type: Number, default: null },
+
+    // Laundry tracker — excluded from recommendations when true
+    inLaundry: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

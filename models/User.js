@@ -2,34 +2,29 @@ import mongoose from "mongoose";
 
 const PreferencesSchema = new mongoose.Schema(
   {
-    // Colors the user tends to pick (e.g. ["black", "white", "navy"])
-    preferredColors: { type: [String], default: [] },
-    // Colors the user has rejected
-    avoidedColors: { type: [String], default: [] },
-    // Styles they like (e.g. ["casual", "formal"])
-    preferredStyles: { type: [String], default: [] },
-    // Styles they dislike
-    avoidedStyles: { type: [String], default: [] },
-    // Patterns they like (e.g. ["solid", "stripes"])
+    preferredColors:   { type: [String], default: [] },
+    avoidedColors:     { type: [String], default: [] },
+    preferredStyles:   { type: [String], default: [] },
+    avoidedStyles:     { type: [String], default: [] },
     preferredPatterns: { type: [String], default: [] },
-    // Occasions they dress for most
-    commonOccasions: { type: [String], default: [] },
+    commonOccasions:   { type: [String], default: [] },
+    // Location — entered once on profile, used everywhere
+    city: { type: String, default: "" },
+    // Skin tone analysis result (warm / cool / neutral / unknown)
+    skinTone:         { type: String, default: "" },
+    skinToneImageUrl: { type: String, default: "" },
   },
   { _id: false }
 );
 
 const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    // Hashed password — null for OAuth users
+    name:     { type: String, required: true },
+    email:    { type: String, required: true, unique: true },
     password: { type: String, default: null },
-    image: { type: String, default: null },
-    // Learned style preferences updated after each feedback
-    preferences: { type: PreferencesSchema, default: () => ({}) },
-    // Date of the last generated Outfit of the Day (YYYY-MM-DD string)
+    image:    { type: String, default: null },
+    preferences:    { type: PreferencesSchema, default: () => ({}) },
     lastOutfitDate: { type: String, default: null },
-    // Cached Outfit of the Day for today
     outfitOfTheDay: { type: mongoose.Schema.Types.Mixed, default: null },
   },
   { timestamps: true }

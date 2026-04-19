@@ -13,6 +13,10 @@ import {
   ArrowRight,
   Loader2,
   RefreshCcw,
+  MessageCircle,
+  Leaf,
+  CalendarDays,
+  Backpack,
 } from "lucide-react";
 import axios from "axios";
 
@@ -177,11 +181,26 @@ export default function DashboardPage() {
         </motion.section>
       </div>
 
-      {/* Quick actions */}
+      {/* Feature cards */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
+      >
+        <h2 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Explore Features</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <FeatureCard href="/chat"          icon={<MessageCircle className="w-5 h-5 text-blue-500" />}    label="Style Chat"     desc="Chat with AI stylist" bg="bg-blue-50 dark:bg-blue-900/20" />
+          <FeatureCard href="/calendar"      icon={<CalendarDays className="w-5 h-5 text-green-500" />}    label="Calendar"       desc="Plan weekly outfits" bg="bg-green-50 dark:bg-green-900/20" />
+          <FeatureCard href="/sustainability" icon={<Leaf className="w-5 h-5 text-emerald-500" />}         label="Insights"       desc="Cost per wear" bg="bg-emerald-50 dark:bg-emerald-900/20" />
+          <FeatureCard href="/packing"       icon={<Backpack className="w-5 h-5 text-orange-500" />}       label="Packing"        desc="Smart trip packing" bg="bg-orange-50 dark:bg-orange-900/20" />
+        </div>
+      </motion.section>
+
+      {/* Quick actions */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
         className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4"
       >
         <div>
@@ -203,6 +222,16 @@ export default function DashboardPage() {
 }
 
 // ── Sub-components ───────────────────────────────────────────────
+
+function FeatureCard({ href, icon, label, desc, bg }) {
+  return (
+    <Link href={href} className={`${bg} rounded-2xl p-4 flex flex-col gap-2 hover:opacity-90 transition`}>
+      {icon}
+      <p className="font-semibold text-gray-800 dark:text-white text-sm">{label}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{desc}</p>
+    </Link>
+  );
+}
 
 function StatCard({ icon, label, value, bg, href }) {
   const content = (

@@ -26,11 +26,12 @@ export async function GET(request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const city = searchParams.get("city") || "Mumbai";
 
     await connectDB();
 
     const user = await User.findById(session.user.id);
+    // Use query param → stored profile city → default
+    const city = searchParams.get("city") || user?.preferences?.city || "Mumbai";
     const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
 
     // ── Return cached outfit if already generated today ──────────
@@ -47,6 +48,7 @@ export async function GET(request) {
     // ── Generate a fresh outfit ──────────────────────────────────
     const wardrobeItems = await ClothingItem.find({
       userId: session.user.id,
+      inLaundry: false,
     }).lean();
 
     if (wardrobeItems.length < 2) {
