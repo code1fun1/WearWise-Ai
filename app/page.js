@@ -46,7 +46,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-2">
           <Sparkles className="w-6 h-6 text-purple-600" />
           <span className="text-xl font-bold text-purple-700">
-            AI Wardrobe
+            WearWize
           </span>
         </div>
         <div className="flex gap-3">
@@ -125,7 +125,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="text-center py-6 text-sm text-gray-400 border-t border-gray-100">
-        © {new Date().getFullYear()} AI Wardrobe Stylist. All rights reserved.
+        © {new Date().getFullYear()} WearWize. All rights reserved.
       </footer>
     </main>
   );

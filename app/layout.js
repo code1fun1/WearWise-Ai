@@ -9,14 +9,14 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI Wardrobe Stylist",
+  title: "WearWize — Your AI Stylist",
   description: "Your personal AI-powered wardrobe manager and outfit generator",
   manifest: "/manifest.json",
   themeColor: "#7c3aed",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "AI Wardrobe",
+    title: "WearWize",
   },
 };
 

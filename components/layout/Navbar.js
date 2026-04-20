@@ -52,7 +52,7 @@ export default function Navbar() {
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
           <Sparkles className="w-5 h-5 text-purple-600" />
           <span className="font-bold text-purple-700 dark:text-purple-400 hidden sm:block">
-            AI Wardrobe
+            WearWize
           </span>
         </Link>
 
