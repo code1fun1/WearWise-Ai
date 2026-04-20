@@ -9,6 +9,7 @@ import {
   Sparkles, Shirt, Brain, CloudSun, CalendarDays, Leaf,
   MessageCircle, Backpack, ArrowRight, CheckCircle2, Star, Zap,
 } from "lucide-react";
+import ParticleHeadline from "@/components/landing/ParticleHeadline";
 
 // ── Deterministic background data (no Math.random → no hydration mismatch) ──
 const STARS = Array.from({ length: 160 }, (_, i) => ({
@@ -207,16 +208,9 @@ export default function LandingPage() {
       ════════════════════════════════════════════════════════════ */}
       <section className="relative z-20 flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75 }}>
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 mb-8 text-[11px] font-semibold tracking-[0.16em] text-purple-300 bg-purple-500/12 border border-purple-500/20 rounded-full uppercase">
-            <Zap className="w-3 h-3" /> Powered by Google Gemini AI
-          </span>
-
-          <h1 className="text-5xl sm:text-6xl md:text-[76px] font-extrabold text-white leading-[1.04] mb-6 tracking-tight">
-            Your wardrobe,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400">
-              styled by AI
-            </span>
-          </h1>
+          <div className="mb-6">
+            <ParticleHeadline line1="Your wardrobe," line2="styled by AI" />
+          </div>
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             Upload your clothes once. Get AI-curated outfits every day — tailored
