@@ -6,6 +6,7 @@ import ClothingItem from "@/models/ClothingItem";
 import User from "@/models/User";
 import { getWeather } from "@/services/weatherService";
 import { chatWithStylist } from "@/services/geminiService";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * POST /api/chat-stylist
@@ -17,6 +18,9 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "chat-stylist", LIMITS["chat-stylist"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "Style Chat messages");
 
     const { messages } = await request.json();
     if (!messages?.length) {

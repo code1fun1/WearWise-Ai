@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import ClothingItem from "@/models/ClothingItem";
 import { getWeather } from "@/services/weatherService";
 import { generatePackingList } from "@/services/geminiService";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * POST /api/packing
@@ -14,6 +15,9 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "packing", LIMITS["packing"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "Packing List generation");
 
     const { destination, days, purpose } = await request.json();
     if (!destination || !days || !purpose) {

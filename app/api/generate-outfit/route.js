@@ -9,6 +9,7 @@ import { getWeather } from "@/services/weatherService";
 import { generateOutfits } from "@/services/geminiService";
 import { mapOccasionToStyle } from "@/lib/occasionMapper";
 import { filterWardrobeForOutfit } from "@/lib/wardrobeFilter";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * POST /api/generate-outfit
@@ -27,9 +28,10 @@ import { filterWardrobeForOutfit } from "@/lib/wardrobeFilter";
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "generate-outfit", LIMITS["generate-outfit"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "outfit generation");
 
     const body = await request.json();
     const occasion = body.occasion?.trim();

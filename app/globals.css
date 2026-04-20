@@ -56,6 +56,19 @@
   body {
     @apply bg-background text-foreground transition-colors duration-200;
   }
+  /* Prevent dark-mode body text from making inputs unreadable on white backgrounds */
+  input,
+  textarea,
+  select {
+    color: #111827;
+    background-color: #ffffff;
+  }
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color: #f9fafb;
+    background-color: #1f2937;
+  }
 }
 
 /* Dark mode body */

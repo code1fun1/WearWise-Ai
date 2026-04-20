@@ -2,10 +2,11 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, ImagePlus, Loader2, CheckCircle2 } from "lucide-react";
+import { X, Upload, ImagePlus, Loader2, CheckCircle2, Zap } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import axios from "axios";
+import { compressImage, formatBytes } from "@/lib/compressImage";
 
 /**
  * Modal dialog for uploading a new clothing item.
@@ -15,15 +16,17 @@ import axios from "axios";
 export default function UploadClothingModal({ onClose, onSuccess }) {
   const fileInputRef = useRef(null);
 
-  const [preview, setPreview] = useState(null);     // data-URL for preview
-  const [file, setFile] = useState(null);           // actual File object
-  const [customName, setCustomName] = useState("");
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [aiTags, setAiTags] = useState(null);       // shown after upload
+  const [preview, setPreview]         = useState(null);   // data-URL for preview
+  const [file, setFile]               = useState(null);   // compressed File object
+  const [customName, setCustomName]   = useState("");
+  const [notes, setNotes]             = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [sizeInfo, setSizeInfo]       = useState(null);   // { originalSize, compressedSize }
+  const [aiTags, setAiTags]           = useState(null);   // shown after upload
 
   // ── File selection ────────────────────────────────────────────
-  function handleFileChange(e) {
+  async function handleFileChange(e) {
     const selected = e.target.files?.[0];
     if (!selected) return;
 
@@ -37,11 +40,19 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
       return;
     }
 
-    setFile(selected);
     setAiTags(null);
+    setSizeInfo(null);
+    setCompressing(true);
+
+    const { file: compressed, originalSize, compressedSize } = await compressImage(selected);
+
+    setFile(compressed);
+    setSizeInfo({ originalSize, compressedSize });
+    setCompressing(false);
+
     const reader = new FileReader();
     reader.onload = (ev) => setPreview(ev.target.result);
-    reader.readAsDataURL(selected);
+    reader.readAsDataURL(compressed);
   }
 
   // ── Drag-and-drop ─────────────────────────────────────────────
@@ -124,7 +135,12 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
               className="relative border-2 border-dashed border-purple-200 rounded-xl cursor-pointer hover:border-purple-400 transition bg-purple-50/40 flex items-center justify-center"
               style={{ minHeight: 200 }}
             >
-              {preview ? (
+              {compressing ? (
+                <div className="flex flex-col items-center gap-2 text-purple-400 p-8">
+                  <Loader2 className="w-8 h-8 animate-spin" />
+                  <p className="text-sm font-medium">Optimising image…</p>
+                </div>
+              ) : preview ? (
                 <Image
                   src={preview}
                   alt="Preview"
@@ -150,6 +166,17 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
                 onChange={handleFileChange}
               />
             </div>
+
+            {/* Compression info badge */}
+            {sizeInfo && sizeInfo.compressedSize < sizeInfo.originalSize && (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                <Zap className="w-3.5 h-3.5 shrink-0" />
+                Compressed {formatBytes(sizeInfo.originalSize)} → {formatBytes(sizeInfo.compressedSize)}
+                <span className="ml-auto font-semibold">
+                  -{Math.round((1 - sizeInfo.compressedSize / sizeInfo.originalSize) * 100)}%
+                </span>
+              </div>
+            )}
 
             {/* AI tags preview (shown after upload) */}
             {aiTags && (
@@ -184,7 +211,7 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
               placeholder="Custom name (optional)"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
             />
 
             {/* Optional notes */}
@@ -193,18 +220,23 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm resize-none"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm resize-none"
             />
 
             <button
               type="submit"
-              disabled={loading || !file}
+              disabled={loading || compressing || !file}
               className="w-full py-2.5 rounded-lg bg-purple-600 text-white font-semibold text-sm hover:bg-purple-700 transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Uploading & tagging…
+                </>
+              ) : compressing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Optimising…
                 </>
               ) : (
                 <>

@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import ClothingItem from "@/models/ClothingItem";
 import { uploadImage } from "@/services/cloudinaryService";
 import { tagClothingImage } from "@/services/geminiService";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * POST /api/upload-clothing
@@ -23,9 +24,10 @@ export async function POST(request) {
   try {
     // ── Auth ────────────────────────────────────────────────────
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "upload-clothing", LIMITS["upload-clothing"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "clothing uploads");
 
     // ── Parse form data ─────────────────────────────────────────
     const formData = await request.formData();

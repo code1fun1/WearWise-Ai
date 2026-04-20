@@ -11,7 +11,7 @@ export async function GET() {
 
     await connectDB();
     const user = await User.findById(session.user.id)
-      .select("name email image preferences createdAt")
+      .select("name email image preferences onboardingCompleted createdAt")
       .lean();
 
     if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -21,6 +21,7 @@ export async function GET() {
       email: user.email,
       image: user.image,
       preferences: user.preferences || {},
+      onboardingCompleted: user.onboardingCompleted ?? false,
       memberSince: user.createdAt,
     });
   } catch (error) {
@@ -43,9 +44,11 @@ export async function PATCH(request) {
     await connectDB();
 
     const updateFields = {};
-    if (body.city !== undefined)             updateFields["preferences.city"] = body.city.trim();
-    if (body.skinTone !== undefined)         updateFields["preferences.skinTone"] = body.skinTone;
-    if (body.skinToneImageUrl !== undefined) updateFields["preferences.skinToneImageUrl"] = body.skinToneImageUrl;
+    if (body.city !== undefined)                updateFields["preferences.city"] = body.city.trim();
+    if (body.skinTone !== undefined)            updateFields["preferences.skinTone"] = body.skinTone;
+    if (body.skinToneImageUrl !== undefined)    updateFields["preferences.skinToneImageUrl"] = body.skinToneImageUrl;
+    if (body.commonOccasions !== undefined)     updateFields["preferences.commonOccasions"] = body.commonOccasions;
+    if (body.onboardingCompleted !== undefined) updateFields["onboardingCompleted"] = body.onboardingCompleted;
 
     if (Object.keys(updateFields).length === 0) {
       return NextResponse.json({ message: "Nothing to update" }, { status: 400 });

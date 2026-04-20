@@ -11,16 +11,42 @@ import {
   RefreshCcw,
   ShoppingBag,
   Star,
+  ExternalLink,
+  Plus,
+  Check,
 } from "lucide-react";
 import Image from "next/image";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const STORES = [
+  { name: "Myntra", url: (t) => `https://www.myntra.com/search?rawQuery=${encodeURIComponent(t)}` },
+  { name: "AJIO",   url: (t) => `https://www.ajio.com/search/?text=${encodeURIComponent(t)}` },
+  { name: "Amazon", url: (t) => `https://www.amazon.in/s?k=${encodeURIComponent(t + " clothing")}` },
+];
+
 export default function CapsulePage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [addedToWishlist, setAddedToWishlist] = useState({});
 
   useEffect(() => { fetchAnalysis(); }, []);
+
+  async function addToWishlist(piece) {
+    setAddedToWishlist((prev) => ({ ...prev, [piece.type]: "loading" }));
+    try {
+      const { data: res } = await axios.post("/api/wishlist", {
+        itemType: piece.type,
+        reason: piece.reason,
+        source: "capsule",
+      });
+      setAddedToWishlist((prev) => ({ ...prev, [piece.type]: "done" }));
+      toast.success(res.duplicate ? `Already on your wishlist` : `Added "${piece.type}" to wishlist`);
+    } catch {
+      setAddedToWishlist((prev) => ({ ...prev, [piece.type]: null }));
+      toast.error("Failed to add to wishlist");
+    }
+  }
 
   async function fetchAnalysis() {
     setLoading(true);
@@ -176,7 +202,7 @@ export default function CapsulePage() {
         </motion.section>
       )}
 
-      {/* Missing pieces */}
+      {/* Missing pieces — Shop the Gap */}
       {data.missingPieces?.length > 0 && (
         <motion.section
           initial={{ opacity: 0, y: 12 }}
@@ -184,22 +210,68 @@ export default function CapsulePage() {
           transition={{ delay: 0.15 }}
           className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5"
         >
-          <h3 className="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4 text-purple-500" />
-            What You're Missing
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-purple-500" />
+              Shop the Gap
+            </h3>
+            <a
+              href="/wishlist"
+              className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-medium"
+            >
+              View Wishlist →
+            </a>
+          </div>
           <div className="space-y-3">
-            {data.missingPieces.map((piece, i) => (
-              <div key={i} className="flex items-start gap-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3">
-                <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center shrink-0">
-                  <ShoppingBag className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            {data.missingPieces.map((piece, i) => {
+              const state = addedToWishlist[piece.type];
+              return (
+                <div key={i} className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center shrink-0">
+                      <ShoppingBag className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-semibold text-sm text-gray-800 dark:text-white capitalize">{piece.type}</p>
+                        <button
+                          onClick={() => addToWishlist(piece)}
+                          disabled={state === "loading" || state === "done"}
+                          className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-lg font-medium transition shrink-0 ${
+                            state === "done"
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 hover:bg-purple-200"
+                          }`}
+                        >
+                          {state === "loading" ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : state === "done" ? (
+                            <><Check className="w-3 h-3" /> Saved</>
+                          ) : (
+                            <><Plus className="w-3 h-3" /> Wishlist</>
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{piece.reason}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {STORES.map((store) => (
+                          <a
+                            key={store.name}
+                            href={store.url(piece.type)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-purple-300 hover:text-purple-700 transition"
+                          >
+                            {store.name}
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-800 dark:text-white capitalize">{piece.type}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{piece.reason}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.section>
       )}

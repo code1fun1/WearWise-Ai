@@ -24,6 +24,7 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, default: null },
     image:    { type: String, default: null },
     preferences:    { type: PreferencesSchema, default: () => ({}) },
+    onboardingCompleted: { type: Boolean, default: false },
     lastOutfitDate: { type: String, default: null },
     outfitOfTheDay: { type: mongoose.Schema.Types.Mixed, default: null },
   },
