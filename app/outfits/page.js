@@ -131,41 +131,44 @@ export default function OutfitsPage() {
     <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Outfit Generator</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Tell us the occasion and get 3 AI-curated outfits from your wardrobe
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Outfit Generator</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          Pick an occasion and get 3 AI-curated outfits from your wardrobe
         </p>
       </div>
 
       {/* Form */}
       <form
         onSubmit={handleGenerate}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8"
+        className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6 mb-8"
       >
-        <div className="flex flex-wrap gap-4">
-          {/* Occasion */}
-          <div className="flex-1 min-w-[180px]">
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
-              Occasion
-            </label>
-            <select
-              value={occasion}
-              onChange={(e) => setOccasion(e.target.value)}
-              required
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm capitalize"
-            >
-              <option value="">Select occasion…</option>
-              {OCCASION_OPTIONS.map((o) => (
-                <option key={o} value={o} className="capitalize">
-                  {o}
-                </option>
-              ))}
-            </select>
+        {/* Occasion chips */}
+        <div className="mb-5">
+          <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wide">
+            Occasion
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {OCCASION_OPTIONS.map((o) => (
+              <button
+                key={o}
+                type="button"
+                onClick={() => setOccasion(o)}
+                className={`px-3.5 py-1.5 rounded-full text-sm font-medium capitalize transition border ${
+                  occasion === o
+                    ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                    : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-purple-300 hover:text-purple-600 dark:hover:text-purple-400"
+                }`}
+              >
+                {o}
+              </button>
+            ))}
           </div>
+        </div>
 
+        <div className="flex flex-wrap gap-4 items-end">
           {/* City */}
           <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
               Your City <span className="normal-case text-gray-400 font-normal">(saved in profile)</span>
             </label>
             <div className="relative">
@@ -175,31 +178,29 @@ export default function OutfitsPage() {
                 placeholder="e.g. Mumbai"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
               />
             </div>
           </div>
 
           {/* Submit */}
-          <div className="flex items-end">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 transition disabled:opacity-60 shadow-sm"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Styling…
-                </>
-              ) : (
-                <>
-                  <Wand2 className="w-4 h-4" />
-                  Generate Outfits
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading || !occasion}
+            className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 transition disabled:opacity-50 shadow-sm"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Styling…
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-4 h-4" />
+                Generate Outfits
+              </>
+            )}
+          </button>
         </div>
       </form>
 
@@ -240,7 +241,7 @@ export default function OutfitsPage() {
             className="space-y-4"
           >
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-gray-800">
+              <h2 className="font-semibold text-gray-800 dark:text-white">
                 Your Outfit Suggestions
               </h2>
               <button
@@ -258,6 +259,7 @@ export default function OutfitsPage() {
                   key={i}
                   outfit={outfit}
                   index={i}
+                  occasion={occasion}
                   onSelect={handleSelect}
                   onReject={handleReject}
                   selected={selectedIndex === i}

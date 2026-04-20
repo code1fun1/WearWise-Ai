@@ -17,21 +17,35 @@ import {
   Leaf,
   CalendarDays,
   Backpack,
+  History,
 } from "lucide-react";
 import axios from "axios";
+import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+import CostTrackerCard from "@/components/dashboard/CostTrackerCard";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
 
-  const [wardrobe, setWardrobe]   = useState([]);
-  const [ootd, setOotd]           = useState(null);
-  const [ootdLoading, setOotdLoading] = useState(true);
+  const [wardrobe, setWardrobe]         = useState([]);
+  const [ootd, setOotd]                 = useState(null);
+  const [ootdLoading, setOotdLoading]   = useState(true);
   const [wardrobeLoading, setWardrobeLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding]   = useState(false);
 
   useEffect(() => {
     fetchWardrobe();
     fetchOotd();
+    checkOnboarding();
   }, []);
+
+  async function checkOnboarding() {
+    try {
+      const { data } = await axios.get("/api/profile");
+      if (!data.onboardingCompleted) setShowOnboarding(true);
+    } catch {
+      // Non-critical — skip wizard if check fails
+    }
+  }
 
   async function fetchWardrobe() {
     try {
@@ -59,6 +73,13 @@ export default function DashboardPage() {
   const firstName = session?.user?.name?.split(" ")[0] || "there";
 
   return (
+    <>
+      {showOnboarding && (
+        <OnboardingWizard
+          userName={session?.user?.name || "there"}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
       {/* Greeting */}
@@ -66,10 +87,10 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Good {getGreeting()}, {firstName} 👋
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Here&apos;s your style overview for today
         </p>
       </motion.div>
@@ -80,21 +101,21 @@ export default function DashboardPage() {
           icon={<Shirt className="w-5 h-5 text-purple-500" />}
           label="Wardrobe Items"
           value={wardrobeLoading ? "—" : wardrobe.length}
-          bg="bg-purple-50"
+          bg="bg-purple-50 dark:bg-purple-900/20"
         />
         <StatCard
           icon={<Wand2 className="w-5 h-5 text-pink-500" />}
           label="Generate Outfits"
           value="Try Now"
           href="/outfits"
-          bg="bg-pink-50"
+          bg="bg-pink-50 dark:bg-pink-900/20"
         />
         <StatCard
           icon={<Sparkles className="w-5 h-5 text-yellow-500" />}
           label="Add Clothing"
           value="Upload"
           href="/wardrobe"
-          bg="bg-yellow-50"
+          bg="bg-yellow-50 dark:bg-yellow-900/20"
         />
       </div>
 
@@ -105,12 +126,12 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-purple-500" />
-              <h2 className="font-bold text-gray-800">Outfit of the Day</h2>
+              <h2 className="font-bold text-gray-800 dark:text-white">Outfit of the Day</h2>
             </div>
             <button
               onClick={fetchOotd}
@@ -138,12 +159,12 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-6"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Shirt className="w-5 h-5 text-purple-500" />
-              <h2 className="font-bold text-gray-800">Your Wardrobe</h2>
+              <h2 className="font-bold text-gray-800 dark:text-white">Your Wardrobe</h2>
             </div>
             <Link
               href="/wardrobe"
@@ -181,6 +202,9 @@ export default function DashboardPage() {
         </motion.section>
       </div>
 
+      {/* Cost Tracker */}
+      <CostTrackerCard />
+
       {/* Feature cards */}
       <motion.section
         initial={{ opacity: 0, y: 16 }}
@@ -189,6 +213,7 @@ export default function DashboardPage() {
       >
         <h2 className="font-semibold text-gray-700 dark:text-gray-300 mb-3">Explore Features</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <FeatureCard href="/history"        icon={<History className="w-5 h-5 text-purple-500" />}      label="History"        desc="Browse past outfits"  bg="bg-purple-50 dark:bg-purple-900/20" />
           <FeatureCard href="/chat"          icon={<MessageCircle className="w-5 h-5 text-blue-500" />}    label="Style Chat"     desc="Chat with AI stylist" bg="bg-blue-50 dark:bg-blue-900/20" />
           <FeatureCard href="/calendar"      icon={<CalendarDays className="w-5 h-5 text-green-500" />}    label="Calendar"       desc="Plan weekly outfits" bg="bg-green-50 dark:bg-green-900/20" />
           <FeatureCard href="/sustainability" icon={<Leaf className="w-5 h-5 text-emerald-500" />}         label="Insights"       desc="Cost per wear" bg="bg-emerald-50 dark:bg-emerald-900/20" />
@@ -218,6 +243,7 @@ export default function DashboardPage() {
         </Link>
       </motion.section>
     </main>
+    </>
   );
 }
 
@@ -235,11 +261,11 @@ function FeatureCard({ href, icon, label, desc, bg }) {
 
 function StatCard({ icon, label, value, bg, href }) {
   const content = (
-    <div className={`${bg} rounded-2xl p-4 flex items-center gap-3`}>
+    <div className={`${bg} rounded-2xl p-4 flex items-center gap-3 hover:opacity-90 transition`}>
       <div className="shrink-0">{icon}</div>
       <div>
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className="font-bold text-gray-800 text-lg leading-tight">{value}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+        <p className="font-bold text-gray-800 dark:text-white text-lg leading-tight">{value}</p>
       </div>
     </div>
   );

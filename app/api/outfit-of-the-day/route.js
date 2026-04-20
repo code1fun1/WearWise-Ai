@@ -9,6 +9,7 @@ import { getWeather } from "@/services/weatherService";
 import { generateOutfits } from "@/services/geminiService";
 import { mapOccasionToStyle } from "@/lib/occasionMapper";
 import { filterWardrobeForOutfit } from "@/lib/wardrobeFilter";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * GET /api/outfit-of-the-day?city=Mumbai
@@ -21,9 +22,10 @@ import { filterWardrobeForOutfit } from "@/lib/wardrobeFilter";
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "outfit-of-the-day", LIMITS["outfit-of-the-day"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "Outfit of the Day");
 
     const { searchParams } = new URL(request.url);
 

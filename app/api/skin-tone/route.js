@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import { analyzeSkinTone } from "@/services/geminiService";
 import { uploadImage } from "@/services/cloudinaryService";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * POST /api/skin-tone
@@ -15,6 +16,9 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "skin-tone", LIMITS["skin-tone"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "Skin Tone Analysis");
 
     const formData = await request.formData();
     const file = formData.get("image");
