@@ -11,6 +11,7 @@ export const config = {
     "/packing/:path*",
     "/calendar/:path*",
     "/capsule/:path*",
+    "/history/:path*",
     "/api/wardrobe/:path*",
     "/api/upload-clothing/:path*",
     "/api/generate-outfit/:path*",
@@ -23,5 +24,10 @@ export const config = {
     "/api/capsule/:path*",
     "/api/outfit-plan/:path*",
     "/api/skin-tone/:path*",
+    "/api/outfit-history/:path*",
+    "/api/cost-summary/:path*",
+    "/wishlist",
+    "/wishlist/:path*",
+    "/api/wishlist/:path*",
   ],
 };

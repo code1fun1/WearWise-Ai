@@ -1,17 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ThumbsUp, ThumbsDown, Sparkles } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Sparkles, Share2 } from "lucide-react";
+import ShareCardModal from "@/components/outfits/ShareCardModal";
 
 /**
  * Displays a single generated outfit.
  * Shows clothing item images in a row + AI explanation.
  * Select / Reject buttons emit callbacks to the parent.
  */
-export default function OutfitCard({ outfit, index, onSelect, onReject, selected, rejected }) {
+export default function OutfitCard({ outfit, index, onSelect, onReject, selected, rejected, occasion }) {
   const isSelected = selected;
   const isRejected = rejected;
+  const [showShare, setShowShare] = useState(false);
 
   return (
     <motion.div
@@ -26,6 +29,15 @@ export default function OutfitCard({ outfit, index, onSelect, onReject, selected
           : "border-gray-200 bg-white hover:border-purple-300"
       }`}
     >
+      {/* Share modal */}
+      {showShare && (
+        <ShareCardModal
+          outfit={outfit}
+          occasion={occasion || "casual"}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -34,16 +46,25 @@ export default function OutfitCard({ outfit, index, onSelect, onReject, selected
             Outfit {index + 1}
           </span>
         </div>
-        {isSelected && (
-          <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
-            Selected
-          </span>
-        )}
-        {isRejected && (
-          <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full font-medium">
-            Skipped
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {isSelected && (
+            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+              Selected
+            </span>
+          )}
+          {isRejected && (
+            <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full font-medium">
+              Skipped
+            </span>
+          )}
+          <button
+            onClick={() => setShowShare(true)}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition text-gray-400 hover:text-purple-600"
+            title="Share this outfit"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Clothing item images */}

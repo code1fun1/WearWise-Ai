@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/authOptions";
 import { connectDB } from "@/lib/mongodb";
 import ClothingItem from "@/models/ClothingItem";
 import { generateCapsuleAnalysis } from "@/services/geminiService";
+import { rateLimit, rateLimitResponse, LIMITS } from "@/lib/rateLimit";
 
 /**
  * GET /api/capsule
@@ -13,6 +14,9 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorised" }, { status: 401 });
+
+    const rl = rateLimit(session.user.id, "capsule", LIMITS["capsule"]);
+    if (!rl.allowed) return rateLimitResponse(NextResponse, rl, "Capsule Analysis");
 
     await connectDB();
 
