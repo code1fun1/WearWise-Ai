@@ -3,7 +3,7 @@ import Groq from "groq-sdk";
 
 // ── Gemini: Vision ONLY (image tagging + skin tone) ─────────────
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const visionModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
 // ── Groq: All text tasks (outfits, chat, capsule, packing) ───────
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });

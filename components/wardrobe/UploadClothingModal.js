@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, ImagePlus, Loader2, CheckCircle2, Zap } from "lucide-react";
+import { X, Upload, ImagePlus, Loader2, CheckCircle2, Zap, Camera } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import axios from "axios";
@@ -14,7 +14,8 @@ import { compressImage, formatBytes } from "@/lib/compressImage";
  * the new card without a full page refresh.
  */
 export default function UploadClothingModal({ onClose, onSuccess }) {
-  const fileInputRef = useRef(null);
+  const fileInputRef   = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const [preview, setPreview]         = useState(null);   // data-URL for preview
   const [file, setFile]               = useState(null);   // compressed File object
@@ -165,7 +166,28 @@ export default function UploadClothingModal({ onClose, onSuccess }) {
                 className="hidden"
                 onChange={handleFileChange}
               />
+              {/* Camera input — rear camera on mobile */}
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                capture="environment"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
+
+            {/* Camera button — only meaningful on mobile but shown always */}
+            {!preview && !compressing && (
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-purple-300 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition text-sm font-medium"
+              >
+                <Camera className="w-4 h-4" />
+                Take Photo with Camera
+              </button>
+            )}
 
             {/* Compression info badge */}
             {sizeInfo && sizeInfo.compressedSize < sizeInfo.originalSize && (
