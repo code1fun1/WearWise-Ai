@@ -17,6 +17,7 @@ import {
   CloudSun,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import ParticleHeadline from "@/components/landing/ParticleHeadline";
 
 const perks = [
   { icon: <Sparkles className="w-4 h-4" />, text: "AI-curated outfits from your wardrobe" },
@@ -84,11 +85,8 @@ export default function SignInPage() {
 
         {/* Center content */}
         <div className="relative">
-          <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
-            Your wardrobe,<br />
-            <span className="text-purple-200">styled by AI</span>
-          </h2>
-          <p className="text-purple-100 text-sm leading-relaxed mb-10 max-w-xs">
+          <ParticleHeadline line1="Start dressing" line2="smarter today" height={180} allWhite line2Scale={0.65} />
+          <p className="text-purple-100 text-sm leading-relaxed mb-10 max-w-xs mt-4">
             Upload your clothes once. Get a perfect outfit every day — tailored to
             your occasion, the weather, and your personal taste.
           </p>
