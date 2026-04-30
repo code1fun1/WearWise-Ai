@@ -12,7 +12,8 @@ const SPRING       = 0.072; // spring back strength
 const DAMPING      = 0.82;  // velocity damping
 
 // Purple (#7c3aed) → Pink (#ec4899) gradient stops
-function particleColor(x, w, isLine2) {
+function particleColor(x, w, isLine2, allWhite) {
+  if (allWhite) return "rgb(255,255,255)";
   const t = Math.max(0, Math.min(1, x / w));
   if (isLine2) {
     const r = Math.round(124 + (236 - 124) * t);
@@ -28,7 +29,7 @@ function particleColor(x, w, isLine2) {
 }
 
 // ─────────────────────────────────────────────────────────────────
-export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "styled by AI" }) {
+export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "styled by AI", height = 240, allWhite = false, line2Scale = 1 }) {
   const canvasRef = useRef(null);
   const mouseRef  = useRef({ x: -9999, y: -9999 });
   const rafRef    = useRef(null);
@@ -44,7 +45,7 @@ export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "st
       await document.fonts.ready;
 
       const W = canvas.offsetWidth  || 800;
-      const H = canvas.offsetHeight || 240;
+      const H = canvas.offsetHeight || height;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       canvas.width  = W * dpr;
@@ -58,7 +59,7 @@ export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "st
       const oc   = off.getContext("2d");
 
       const fs1 = Math.min(Math.round(W / 9), 68);
-      const fs2 = Math.min(Math.round(W / 6), 90);
+      const fs2 = Math.min(Math.round(W / 6 * line2Scale), 90 * line2Scale);
 
       oc.textAlign    = "center";
       oc.textBaseline = "middle";
@@ -83,7 +84,7 @@ export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "st
               cx: Math.random() * W,                     // current position — starts scattered
               cy: -20 + Math.random() * (H + 40),
               vx: 0, vy: 0,
-              color: particleColor(x, W, y > H * 0.48),
+              color: particleColor(x, W, y > H * 0.48, allWhite),
               sz: PARTICLE_MIN + Math.random() * (PARTICLE_MAX - PARTICLE_MIN),
             });
           }
@@ -161,13 +162,13 @@ export default function ParticleHeadline({ line1 = "Your wardrobe,", line2 = "st
       canvas.removeEventListener("touchmove", onTouch);
       canvas.removeEventListener("touchend", onLeave);
     };
-  }, [line1, line2]);
+  }, [line1, line2, height, allWhite, line2Scale]);
 
   return (
     <canvas
       ref={canvasRef}
       className="w-full max-w-3xl mx-auto block"
-      style={{ height: 240, pointerEvents: "auto" }}
+      style={{ height, pointerEvents: "auto" }}
       aria-label={`${line1} ${line2}`}
     />
   );
