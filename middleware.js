@@ -19,6 +19,7 @@ export const config = {
     "/api/feedback/:path*",
     "/api/profile/:path*",
     "/api/chat-stylist/:path*",
+    "/api/chat-sessions/:path*",
     "/api/sustainability/:path*",
     "/api/packing/:path*",
     "/api/capsule/:path*",
