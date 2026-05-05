@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -27,6 +27,14 @@ const perks = [
 ];
 
 export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInInner />
+    </Suspense>
+  );
+}
+
+function SignInInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error");
