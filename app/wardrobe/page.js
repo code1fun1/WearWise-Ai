@@ -1,21 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Shirt, Loader2, Globe2, LayoutGrid } from "lucide-react";
+import { motion } from "framer-motion";
+import { Plus, Shirt, Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import UploadClothingModal from "@/components/wardrobe/UploadClothingModal";
 import ClothingCard from "@/components/wardrobe/ClothingCard";
 import WardrobeFilters from "@/components/wardrobe/WardrobeFilters";
-import WardrobeGlobe from "@/components/wardrobe/WardrobeGlobe";
 
 export default function WardrobePage() {
   const [items, setItems]           = useState([]);
   const [filtered, setFiltered]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [showUpload, setShowUpload] = useState(false);
-  const [view, setView]             = useState("globe");
 
   useEffect(() => { fetchWardrobe(); }, []);
 
@@ -55,30 +53,6 @@ export default function WardrobePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {items.length > 0 && (
-            <div className="hidden sm:flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-0.5">
-              <button
-                onClick={() => setView("globe")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  view === "globe"
-                    ? "bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700"
-                }`}
-              >
-                <Globe2 className="w-3.5 h-3.5" /> Globe
-              </button>
-              <button
-                onClick={() => setView("grid")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  view === "grid"
-                    ? "bg-white dark:bg-gray-700 text-purple-700 dark:text-purple-300 shadow-sm"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700"
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" /> Grid
-              </button>
-            </div>
-          )}
           <button
             onClick={() => setShowUpload(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl text-sm font-semibold hover:bg-purple-700 transition shadow-sm"
@@ -101,50 +75,22 @@ export default function WardrobePage() {
           {filtered.length === 0 ? (
             <EmptyState onAdd={() => setShowUpload(true)} hasItems={true} />
           ) : (
-            <AnimatePresence mode="wait">
-              {view === "globe" && (
-                <motion.div key="globe"
-                  initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.3 }}
-                  className="mt-4"
-                >
-                  <WardrobeGlobe items={filtered} onDelete={handleDelete} />
-                </motion.div>
-              )}
-              {view === "grid" && (
-                <motion.div key="grid"
-                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.25 }}
-                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4"
-                >
-                  {filtered.map((item, i) => (
-                    <motion.div key={item._id}
-                      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                    >
-                      <ClothingCard item={item} onDelete={handleDelete} />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4"
+              >
+                {filtered.map((item, i) => (
+                  <motion.div key={item._id}
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                  >
+                    <ClothingCard item={item} onDelete={handleDelete} />
+                  </motion.div>
+                ))}
+              </motion.div>
           )}
         </>
-      )}
-
-      {/* Mobile floating toggle */}
-      {items.length > 0 && !loading && (
-        <div className="sm:hidden fixed bottom-24 right-4 z-30">
-          <button
-            onClick={() => setView(view === "globe" ? "grid" : "globe")}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-900/90 backdrop-blur text-white rounded-2xl text-xs font-semibold shadow-xl border border-white/10"
-          >
-            {view === "globe"
-              ? <><LayoutGrid className="w-3.5 h-3.5" /> Grid view</>
-              : <><Globe2 className="w-3.5 h-3.5" /> Globe view</>
-            }
-          </button>
-        </div>
       )}
 
       {showUpload && (
