@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "google-calendar": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-google-calendar"],
+      "env": {
+        "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+        "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}",
+        "GOOGLE_REFRESH_TOKEN": "${GOOGLE_REFRESH_TOKEN}"
+      },
+      "description": "Access Google Calendar to fetch events for outfit planning"
+    }
+  }
+}

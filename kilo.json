@@ -1,0 +1,9 @@
+{
+  "mcp": {
+    "google-calendar": {
+      "type": "local",
+      "command": ["npx", "@modelcontextprotocol/server-google-calendar"],
+      "timeout": 30000
+    }
+  }
+}

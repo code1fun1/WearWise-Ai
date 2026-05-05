@@ -28,6 +28,7 @@ export default function DashboardPage() {
 
   const [wardrobe, setWardrobe]         = useState([]);
   const [ootd, setOotd]                 = useState(null);
+  const [ootdError, setOotdError]       = useState(null);
   const [ootdLoading, setOotdLoading]   = useState(true);
   const [wardrobeLoading, setWardrobeLoading] = useState(true);
   const [showOnboarding, setShowOnboarding]   = useState(false);
@@ -60,11 +61,13 @@ export default function DashboardPage() {
 
   async function fetchOotd() {
     setOotdLoading(true);
+    setOotdError(null);
     try {
       const { data } = await axios.get("/api/outfit-of-the-day");
       setOotd(data);
-    } catch {
+    } catch (err) {
       setOotd(null);
+      setOotdError(err.response?.data?.message || "Could not generate outfit");
     } finally {
       setOotdLoading(false);
     }
@@ -148,7 +151,7 @@ export default function DashboardPage() {
               Styling your day…
             </div>
           ) : !ootd?.outfit ? (
-            <OotdEmpty />
+            <OotdEmpty hasWardrobe={wardrobe.length > 0} error={ootdError} onRetry={fetchOotd} />
           ) : (
             <OotdDisplay ootd={ootd} />
           )}
@@ -311,17 +314,31 @@ function OotdDisplay({ ootd }) {
   );
 }
 
-function OotdEmpty() {
+function OotdEmpty({ hasWardrobe, error, onRetry }) {
+  if (hasWardrobe) {
+    return (
+      <div className="flex flex-col items-center py-10 text-center">
+        <Sparkles className="w-8 h-8 text-purple-300 mb-2" />
+        <p className="text-sm text-gray-500 mb-1">
+          {error || "Couldn't generate your outfit"}
+        </p>
+        <p className="text-xs text-gray-400 mb-3">Check your city is set in profile, then retry</p>
+        <button
+          onClick={onRetry}
+          className="text-xs text-purple-600 font-semibold hover:underline flex items-center gap-1"
+        >
+          <RefreshCcw className="w-3 h-3" /> Try again
+        </button>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center py-10 text-center">
       <Sparkles className="w-8 h-8 text-purple-300 mb-2" />
       <p className="text-sm text-gray-500 mb-3">
         Add clothes to your wardrobe to get your daily outfit suggestion
       </p>
-      <Link
-        href="/wardrobe"
-        className="text-xs text-purple-600 font-semibold hover:underline"
-      >
+      <Link href="/wardrobe" className="text-xs text-purple-600 font-semibold hover:underline">
         Add clothing items →
       </Link>
     </div>

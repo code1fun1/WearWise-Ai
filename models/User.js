@@ -17,6 +17,15 @@ const PreferencesSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const GoogleTokensSchema = new mongoose.Schema(
+  {
+    refreshToken: { type: String, default: "" },
+    accessToken:  { type: String, default: "" },
+    expiryDate:   { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
 const UserSchema = new mongoose.Schema(
   {
     name:     { type: String, required: true },
@@ -24,6 +33,7 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, default: null },
     image:    { type: String, default: null },
     preferences:    { type: PreferencesSchema, default: () => ({}) },
+    googleTokens:   { type: GoogleTokensSchema, default: undefined },
     onboardingCompleted: { type: Boolean, default: false },
     lastOutfitDate: { type: String, default: null },
     outfitOfTheDay: { type: mongoose.Schema.Types.Mixed, default: null },

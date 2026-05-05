@@ -27,6 +27,7 @@ export const config = {
     "/api/skin-tone/:path*",
     "/api/outfit-history/:path*",
     "/api/cost-summary/:path*",
+    "/api/google-calendar/:path*",
     "/wishlist",
     "/wishlist/:path*",
     "/api/wishlist/:path*",

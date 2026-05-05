@@ -122,7 +122,29 @@ Return this JSON:
 
 // ── 4. AI Chat Stylist (Groq) ────────────────────────────────────
 
+function isFashionRelatedQuestion(content) {
+  const fashionKeywords = [
+    "wear", "outfit", "wardrobe", "clothes", "clothing", "dress", "shirt", "pant",
+    "jeans", "skirt", "jacket", "coat", "shoe", "sneaker", "boot", "sandals",
+    "color", "style", "fashion", "occasion", "casual", "formal", "party", "wedding",
+    "interview", "work", "office", "date", "gym", "beach", "weather", "season",
+    "match", "combination", "look", "style", "accessory", "bag", "hat",
+    "summer", "winter", "spring", "fall", "monsoon", "ethnic", "western",
+    "kurta", "saree", "lehenga", "suit", "blazer", "hoodie", "sweater", "t-shirt",
+    "what should i wear", "suggest", "recommend", "outfit for", "matching",
+    "layer", "pair", "coordinate", "outfit combination", "what to wear",
+  ];
+
+  const lowerContent = content.toLowerCase();
+  return fashionKeywords.some((kw) => lowerContent.includes(kw));
+}
+
 export async function chatWithStylist({ messages, wardrobe, weather, preferences }) {
+  const lastUserMessage = messages.filter((m) => m.role === "user").pop();
+  if (lastUserMessage && !isFashionRelatedQuestion(lastUserMessage.content)) {
+    return "I'm StyleAI, your personal fashion stylist. I can help you with outfit suggestions, wardrobe combinations, and fashion advice based on your clothes. Please ask me something related to fashion or styling!";
+  }
+
   const wardrobeList = wardrobe.map((item) => ({
     id: item._id.toString(),
     type: item.type,
@@ -139,6 +161,7 @@ export async function chatWithStylist({ messages, wardrobe, weather, preferences
     : "Weather: unknown";
 
   const systemPrompt = `You are StyleAI, a personal fashion stylist assistant. You help users create outfits from their wardrobe.
+You ONLY answer questions about fashion, clothing, outfits, and personal styling. If asked about anything else, politely decline.
 
 WARDROBE (JSON — reference items by their id when suggesting outfits):
 ${JSON.stringify(wardrobeList, null, 2)}
